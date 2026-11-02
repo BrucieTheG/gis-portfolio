@@ -6,3 +6,6 @@ uvicorn[standard]>=0.32
 # ETL helpers
 requests>=2.32
 python-dotenv>=1.0
+# Overture Maps buildings download (brings pyarrow, used to rewrite the GeoParquet)
+overturemaps>=1.0.2
+pyarrow>=20
