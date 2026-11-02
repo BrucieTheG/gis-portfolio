@@ -1,0 +1,8 @@
+# Database access
+psycopg[binary]>=3.2
+# API
+fastapi>=0.115
+uvicorn[standard]>=0.32
+# ETL helpers
+requests>=2.32
+python-dotenv>=1.0
