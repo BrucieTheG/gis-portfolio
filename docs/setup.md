@@ -34,8 +34,9 @@ Versions were confirmed on 2026-11-02 with `scripts/m1-verify.ps1`.
    ```
    It saves a report to `data\m1-verify.txt` (git-ignored). The password is never printed.
 7. **Load the data:** this downloads every source into `data\raw\` (about 600 MB, cached) and builds the
-   `raw` and `core` schemas, builds the routable network (`net` schema, about 1 minute), then writes
-   `docs\data-qc.md` and `docs\network-qc.md`. A first run takes about 15 minutes, mostly the FEMA
+   `raw` and `core` schemas, builds the routable network (`net` schema, about 1 minute), runs the
+   analyses in `db\analysis\` (`analysis` schema, about 1.5 minutes, writes `docs\analysis-results.md`),
+   then writes `docs\data-qc.md` and `docs\network-qc.md`. A first run takes about 15 minutes, mostly the FEMA
    service. Rerunning is safe.
    ```powershell
    .venv\Scripts\python etl\run_all.py

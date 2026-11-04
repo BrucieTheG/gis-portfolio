@@ -2,7 +2,7 @@
 
 Each step replaces its tables, so rerunning is safe. Downloads are cached in data/raw/
 (delete a file there to force a fresh copy). 07_network is built from core.roads, so rerun it
-after 02_osm.
+after 02_osm; 08_analyses reads core and net, so rerun it after any earlier step.
 
     .venv\\Scripts\\python etl\\run_all.py            # everything
     .venv\\Scripts\\python etl\\run_all.py 02 07      # only some steps (QC still runs)
@@ -14,7 +14,7 @@ from pathlib import Path
 
 ETL = Path(__file__).resolve().parent
 STEPS = ["01_boundaries", "02_osm", "03_buildings", "04_gtfs", "05_flood", "06_hydro",
-         "07_network"]
+         "07_network", "08_analyses"]
 REPORTS = {"qc_report": "docs/data-qc.md", "network_qc": "docs/network-qc.md"}
 
 

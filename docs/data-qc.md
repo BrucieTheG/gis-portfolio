@@ -1,6 +1,6 @@
 # Data QC
 
-Generated 2026-11-03 17:10 by `etl/qc_report.py` (checks in `db/qc/qc_functions.sql`).
+Generated 2026-11-03 18:08 by `etl/qc_report.py` (checks in `db/qc/qc_functions.sql`).
 
 Every `core` table must have rows, valid non-empty geometry in EPSG:26915, and no features outside the study boundary (by interior point, 1 m tolerance).
 
