@@ -13,7 +13,7 @@ Versions were confirmed on 2026-11-02 with `scripts/m1-verify.ps1`.
 | osm2pgrouting | bundled with PostGIS | `C:\Program Files\PostgreSQL\18\bin` |
 | osm2pgsql | 2.3.1 (Libosmium 2.23.1, PROJ 9.8.1, Lua 5.5.0) | `A:\gis-tools\osm2pgsql\osm2pgsql-bin\` |
 | pg_tileserv | "latest" snapshot build, dated 2025-12-11 (it reports no version number) | `A:\gis-tools\pg_tileserv\` |
-| Python packages | fastapi 0.162.0, psycopg 3.3.6, uvicorn 0.54.0, python-dotenv 1.2.4, requests 2.34.2, overturemaps 1.0.2, pyarrow 26.0.0 | `.venv\` |
+| Python packages | fastapi 0.162.0, psycopg 3.3.6, psycopg-pool 3.3.3, uvicorn 0.54.0, python-dotenv 1.2.4, requests 2.34.2, overturemaps 1.0.2, pyarrow 26.0.0 | `.venv\` |
 
 ## Steps
 1. **PostgreSQL 18:** install it with the EDB Windows installer. Put the data directory at `A:\PostGRE_Data` and use port 5432.
@@ -41,6 +41,16 @@ Versions were confirmed on 2026-11-02 with `scripts/m1-verify.ps1`.
    ```powershell
    .venv\Scripts\python etl\run_all.py
    ```
+
+8. **Start the services:** this checks PostgreSQL, refreshes the read-only web roles, then starts
+   pg_tileserv (map layers, http://localhost:7800) and the API (http://localhost:8000, docs at `/docs`).
+   Once the website exists (M6) it starts that too. Press Ctrl+C to stop everything; logs are in `logs\`.
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File scripts\start.ps1
+   ```
+   The first run creates two database roles, `tiles_reader` and `api_reader`, and saves random passwords
+   for them to `.env` (`TILES_DB_PASSWORD`, `API_DB_PASSWORD`). To check the running services, run
+   `.venv\Scripts\python scripts\m5_verify.py` in a second shell; it writes `docs\serving-check.md`.
 
 ## Quirks of the bundled tools
 - The PostGIS bundle's GDAL has no PostgreSQL driver and can't read snappy-compressed Parquet. `etl/common.py`

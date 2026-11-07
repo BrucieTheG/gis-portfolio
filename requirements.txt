@@ -1,5 +1,6 @@
 # Database access
 psycopg[binary]>=3.2
+psycopg-pool>=3.2
 # API
 fastapi>=0.115
 uvicorn[standard]>=0.32

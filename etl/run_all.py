@@ -2,7 +2,8 @@
 
 Each step replaces its tables, so rerunning is safe. Downloads are cached in data/raw/
 (delete a file there to force a fresh copy). 07_network is built from core.roads, so rerun it
-after 02_osm; 08_analyses reads core and net, so rerun it after any earlier step.
+after 02_osm; 08_analyses reads core and net, so rerun it after any earlier step. Last,
+09_web_roles re-grants the web services' read-only roles (rebuilt tables lose their grants).
 
     .venv\\Scripts\\python etl\\run_all.py            # everything
     .venv\\Scripts\\python etl\\run_all.py 02 07      # only some steps (QC still runs)
@@ -16,6 +17,7 @@ ETL = Path(__file__).resolve().parent
 STEPS = ["01_boundaries", "02_osm", "03_buildings", "04_gtfs", "05_flood", "06_hydro",
          "07_network", "08_analyses"]
 REPORTS = {"qc_report": "docs/data-qc.md", "network_qc": "docs/network-qc.md"}
+FINAL = "09_web_roles"  # after the reports, which rebuild the qc.net_* layers
 
 
 def main(argv: list[str]) -> int:
@@ -31,6 +33,10 @@ def main(argv: list[str]) -> int:
         print(f"\n=== {report} ===", flush=True)
         if subprocess.run([sys.executable, str(ETL / f"{report}.py")]).returncode != 0:
             failed.append(doc)
+    print(f"\n=== {FINAL} ===", flush=True)
+    if subprocess.run([sys.executable, str(ETL / f"{FINAL}.py")]).returncode != 0:
+        print(f"\n{FINAL} failed.", flush=True)
+        return 1
     print(f"\nPipeline finished in {(time.time() - t0) / 60:.1f} min "
           f"({'QC passed' if not failed else 'QC FAILED - see ' + ', '.join(failed)}).")
     return 1 if failed else 0

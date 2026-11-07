@@ -1,6 +1,6 @@
 # Road Network QC
 
-Generated 2026-11-03 18:09 by `etl/network_qc.py` for the network built by `etl/07_network.py` (schema `net`).
+Generated 2026-11-07 00:30 by `etl/network_qc.py` for the network built by `etl/07_network.py` (schema `net`).
 
 ## Checks
 

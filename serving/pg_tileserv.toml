@@ -1,0 +1,24 @@
+# pg_tileserv settings for local use. scripts/start.ps1 passes this file with --config and
+# sets DATABASE_URL (the tiles_reader role from .env), so no credentials live here.
+# What gets published is controlled by tiles_reader's grants in db/serving/01_web_roles.sql.
+
+HttpHost = "127.0.0.1"
+HttpPort = 7800
+
+# The Vite dev server (M6) and the API docs page.
+CORSOrigins = ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:8000"]
+
+# Cancel a tile that takes longer than this (seconds).
+DbTimeout = 10
+DbPoolMaxConns = 8
+
+# Ask browsers to cache tiles for 10 minutes. The data only changes on an ETL rerun.
+CacheTTL = 600
+
+# A safety cap. Dense layers (buildings, roads) are drawn from zoom 13 or so in the web maps,
+# where a tile holds a few thousand features.
+MaxFeaturesPerTile = 50000
+
+# Tiles are clipped to the study area anyway; advertise sensible zooms to clients.
+DefaultMinZoom = 8
+DefaultMaxZoom = 18

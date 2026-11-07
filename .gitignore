@@ -31,3 +31,6 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+
+# Service logs (scripts/start.ps1)
+logs/

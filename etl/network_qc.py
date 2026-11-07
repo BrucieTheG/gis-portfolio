@@ -68,26 +68,31 @@ DROP TABLE IF EXISTS qc.net_overlaps;
 CREATE TABLE qc.net_overlaps AS
 SELECT a.id AS edge_a, b.id AS edge_b, a.road_class AS class_a, b.road_class AS class_b,
        ST_Length(ST_Intersection(a.geom, b.geom)) AS overlap_m,
-       ST_CollectionExtract(ST_Intersection(a.geom, b.geom), 2) AS geom
+       ST_Multi(ST_CollectionExtract(ST_Intersection(a.geom, b.geom), 2))
+           ::geometry(MultiLineString, {SRID}) AS geom
 FROM net.edges a
 JOIN net.edges b ON a.id < b.id AND a.geom && b.geom AND a.road_id <> b.road_id
 WHERE ST_Overlaps(a.geom, b.geom) OR ST_Equals(a.geom, b.geom);
 DELETE FROM qc.net_overlaps WHERE overlap_m <= 1;
+CREATE INDEX ON qc.net_overlaps USING gist (geom);
 
 -- Islands: connected pieces of the walk or drive network outside the main component.
 DROP TABLE IF EXISTS qc.net_islands;
 CREATE TABLE qc.net_islands AS
 SELECT 'walk' AS mode, v.walk_comp AS component, count(*) AS edges,
-       sum(e.length_m) AS length_m, ST_Multi(ST_Union(e.geom)) AS geom
+       sum(e.length_m) AS length_m,
+       ST_Multi(ST_Union(e.geom))::geometry(MultiLineString, {SRID}) AS geom
 FROM net.edges e JOIN net.vertices v ON v.id = e.source
 WHERE e.walkable AND NOT v.in_walk_main
 GROUP BY v.walk_comp
 UNION ALL
-SELECT 'drive', v.drive_comp, count(*), sum(e.length_m), ST_Multi(ST_Union(e.geom))
+SELECT 'drive', v.drive_comp, count(*), sum(e.length_m),
+       ST_Multi(ST_Union(e.geom))::geometry(MultiLineString, {SRID})
 FROM net.edges e JOIN net.vertices v ON v.id = e.source
 WHERE e.drivable AND v.drive_comp <> (SELECT drive_comp FROM net.vertices
                                       WHERE in_drive_main LIMIT 1)
 GROUP BY v.drive_comp;
+CREATE INDEX ON qc.net_islands USING gist (geom);
 
 -- One-way traps: drive vertices joined to the main road network that you can't drive both
 -- to and from (outside the main strongly connected component).
@@ -97,6 +102,7 @@ SELECT v.id AS vertex_id, v.drive_scc, v.geom
 FROM net.vertices v
 WHERE v.drive_scc IS NOT NULL AND NOT v.in_drive_main
   AND v.drive_comp = (SELECT drive_comp FROM net.vertices WHERE in_drive_main LIMIT 1);
+CREATE INDEX ON qc.net_oneway_traps USING gist (geom);
 """
 
 
